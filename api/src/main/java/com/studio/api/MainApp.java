@@ -54,6 +54,22 @@ public class MainApp {
             ctx.status(404).result("Item not found");
         });
         
+        // API Endpoint: Add Custom Equipment
+        app.post("/api/add", ctx -> {
+            Equipment newItem = gson.fromJson(ctx.body(), Equipment.class);
+            
+            // Check if ID already exists to prevent duplicates
+            for (Equipment item : inventory) {
+                if (item.getId().equalsIgnoreCase(newItem.getId())) {
+                    ctx.status(400).result("Error: Equipment with this ID already exists!");
+                    return;
+                }
+            }
+            
+            inventory.add(newItem);
+            ctx.result("Successfully added!");
+        });
+        
         System.out.println("=========================================");
         System.out.println("  WEB SERVER RUNNING AT: http://localhost:8080 ");
         System.out.println("=========================================");

@@ -218,6 +218,31 @@
             background-color: #e5e7eb;
         }
 
+        /* Modal Styling */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+        .modal {
+            background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+        }
+        .modal h2 { margin-top: 0; color: var(--primary); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+        
+        .btn-add-new {
+            background-color: var(--success); color: white; border: none;
+            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background 0.2s;
+        }
+        .btn-add-new:hover { background-color: #059669; }
+
         /* Toast Notification */
         #toast {
             position: fixed;
@@ -263,12 +288,38 @@
 
     <div class="container">
         <div class="filters">
-            <h2 style="margin:0;">Equipment Roster</h2>
+            <div style="display:flex; align-items:center; gap: 1rem;">
+                <h2 style="margin:0;">Equipment Roster</h2>
+                <button class="btn-add-new" onclick="document.getElementById('addModal').style.display='flex'">+ Add Equipment</button>
+            </div>
             <input type="text" id="searchInput" class="search-bar" placeholder="Search by name, ID, or category..." onkeyup="filterInventory()">
         </div>
 
         <div class="grid" id="inventory-grid">
             <!-- Cards will be injected here -->
+        </div>
+    </div>
+
+    <!-- Add Equipment Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <h2>Add Custom Equipment</h2>
+            <div class="form-group">
+                <label>Equipment ID (e.g., LGT-01)</label>
+                <input type="text" id="newId" placeholder="Unique ID">
+            </div>
+            <div class="form-group">
+                <label>Equipment Name</label>
+                <input type="text" id="newName" placeholder="e.g. Ring Light">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <input type="text" id="newCategory" placeholder="e.g. Lighting">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-return" onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+                <button class="btn-checkout" onclick="submitNewEquipment()">Add Item</button>
+            </div>
         </div>
     </div>
 
@@ -336,6 +387,40 @@
             
             // Keep search filter active after click
             setTimeout(filterInventory, 50); 
+        }
+
+        async function submitNewEquipment() {
+            const id = document.getElementById('newId').value.trim();
+            const name = document.getElementById('newName').value.trim();
+            const category = document.getElementById('newCategory').value.trim();
+
+            if(!id || !name || !category) {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            const payload = { id: id, name: name, category: category };
+            
+            const response = await fetch('/api/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                showToast(`Added ${name} to inventory!`);
+                document.getElementById('addModal').style.display = 'none';
+                
+                // Clear form
+                document.getElementById('newId').value = '';
+                document.getElementById('newName').value = '';
+                document.getElementById('newCategory').value = '';
+                
+                fetchInventory(); // Refresh grid
+            } else {
+                const errorMsg = await response.text();
+                alert(errorMsg);
+            }
         }
 
         function showToast(message) {
