@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.studio</groupId>
+    <artifactId>studio-manager</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    
+    <!-- PACKAGING IS POM: This tells Maven this project only manages other projects -->
+    <packaging>pom</packaging>
+
+    <!-- THESE ARE THE 3 SUB-MODULES WE WILL BUILD -->
+    <modules>
+        <module>core</module>
+        <module>parser</module>
+        <module>api</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>25.0.4</javafx.version>
+    </properties>
+
+    <!-- DEPENDENCY MANAGEMENT: Defines versions centrally. Doesn't download them yet. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.10.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>2.0.7</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.4.11</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
