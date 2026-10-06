@@ -38,7 +38,7 @@ public class MainApp {
 
         // API Endpoint: Get all inventory
         app.get("/api/inventory", ctx -> {
-            ctx.json(inventory);
+            ctx.result(gson.toJson(inventory)).contentType("application/json");
         });
 
         // API Endpoint: Toggle Assignment Status
