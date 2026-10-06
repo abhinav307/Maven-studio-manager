@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Manager</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #444; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .item:last-child { border-bottom: none; }
+        .details h3 { margin: 0 0 5px 0; color: #0056b3; }
+        .details p { margin: 0; font-size: 0.9em; color: #666; }
+        .status { padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
+        .status.available { background-color: #d4edda; color: #155724; }
+        .status.assigned { background-color: #f8d7da; color: #721c24; }
+        button { border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button.checkout { background-color: #007bff; color: white; }
+        button.checkout:hover { background-color: #0056b3; }
+        button.return { background-color: #6c757d; color: white; }
+        button.return:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Studio Inventory Manager</h1>
+        <div id="inventory-list">Loading...</div>
+    </div>
+
+    <script>
+        async function fetchInventory() {
+            const response = await fetch('/api/inventory');
+            const data = await response.json();
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = '';
+
+            data.forEach(item => {
+                const isAssigned = item.isAssigned;
+                
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `
+                    <div class="details">
+                        <h3>[${item.id}] ${item.name}</h3>
+                        <p>Category: ${item.category}</p>
+                    </div>
+                    <div class="actions">
+                        <span class="status ${isAssigned ? 'assigned' : 'available'}">
+                            ${isAssigned ? 'Checked Out' : 'Available'}
+                        </span>
+                        <button class="${isAssigned ? 'return' : 'checkout'}" onclick="toggleStatus('${item.id}')">
+                            ${isAssigned ? 'Return Item' : 'Checkout'}
+                        </button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        async function toggleStatus(id) {
+            await fetch(`/api/toggle?id=${id}`, { method: 'POST' });
+            fetchInventory(); // Refresh the list
+        }
+
+        // Load initially
+        fetchInventory();
+    </script>
+</body>
+</html>
